@@ -25,6 +25,7 @@ def main():
     parser.add_argument("--max_timesteps", type=int)
     parser.add_argument('--num_rollouts', type=int, default=20,
                         help='Number of expert roll outs')
+    parser.add_argument('--data_filename', type=str, default='')
     args = parser.parse_args()
 
     print('loading and building expert policy')
@@ -67,6 +68,10 @@ def main():
 
         expert_data = {'observations': np.array(observations),
                        'actions': np.array(actions)}
+        filename = args.data_filename
+        if filename == '':
+            filename = 'data_' + args.envname + '_rollouts_' + str(args.num_rollouts)
+        np.savez('data/' + filename, **expert_data)
 
 if __name__ == '__main__':
     main()
