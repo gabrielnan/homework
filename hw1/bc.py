@@ -3,19 +3,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def bc(data_file, model_file, input='observations', target='actions',
+def bc(data_file, model_file, input_name='observations', target_name='actions',
        batch_size=100, nb_iters=10000, plot=True):
     print('loading data')
     data = np.load(data_file)
-    x_data = data[input]
-    y_data = data[target]
+    x_data = data[input_name]
+    y_data = data[target_name]
     n = x_data.shape[0]
     batch_size = batch_size
 
     print('building network')
     sess = tf.InteractiveSession()
 
-    x, y_, loss, train_step = build_network(list(x_data.shape[1:]),
+    x, y_, _, loss, train_step = build_network(list(x_data.shape[1:]),
                                             list(y_data.shape[1:]))
     sess.run(tf.global_variables_initializer())
     losses = []
@@ -59,7 +59,7 @@ def build_network(x_shape, y_shape):
 
     loss = tf.reduce_mean(tf.square(y - y_))
     train_step = tf.train.AdamOptimizer(1e-3).minimize(loss)
-    return x, y_, loss, train_step
+    return x, y_, y, loss, train_step
 
 if __name__ == '__main__':
     bc('data/data_Hopper-v1_rollouts_100.npz', 'Hopper-v1_model')
