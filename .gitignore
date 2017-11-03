@@ -94,3 +94,6 @@ ENV/
 # TF Models and data
 */models/*
 */data/*
+
+# Intellij
+*.idea/

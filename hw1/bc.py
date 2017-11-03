@@ -29,7 +29,7 @@ def bc(data_file, model_file, input_name='observations', target_name='actions',
         losses.append(loss_val)
         train_step.run(feed_dict=feed_dict)
 
-    saver.save(sess, '../models/' + model_file)
+    saver.save(sess, model_file)
 
     # Plot losses
     if plot:
@@ -62,4 +62,9 @@ def build_network(x_shape, y_shape):
     return x, y_, y, loss, train_step
 
 if __name__ == '__main__':
-    bc('data/data_Hopper-v1_rollouts_100.npz', 'Hopper-v1_model')
+    envname = 'Humanoid-v1'
+    data_rolls = 100
+    data_file = 'data/' + envname + '_data_' + str(data_rolls) + '.npz'
+    model_file = 'models/' + envname + '_model'
+
+    bc(data_file, model_file)

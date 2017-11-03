@@ -71,9 +71,8 @@ def main():
                        'actions': np.array(actions)}
         filename = args.data_filename
         if filename == '':
-            filename = 'data_' + args.envname + '_rollouts_' + str(
-                args.num_rollouts)
-        np.savez('data/' + filename, **expert_data)
+            filename = 'data/' + args.envname + '_data_' + str(args.num_rollouts)
+        np.savez(filename, **expert_data)
 
 
 if __name__ == '__main__':

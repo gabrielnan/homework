@@ -5,8 +5,8 @@ from load_policy import load_policy
 import matplotlib.pyplot as plt
 
 
-def dagger(envname, data_file, expert_file, max_timesteps=False, render=False,
-           num_rollouts=20, num_train_iters=1000, batch_size=100,
+def dagger(envname, data_file, expert_file, model_file, max_timesteps=False,
+           render=False, num_rollouts=30, num_train_iters=1000, batch_size=100,
            input_name='observations', target_name='actions'):
     # Load initial dataset
     data = np.load(data_file)
@@ -23,6 +23,9 @@ def dagger(envname, data_file, expert_file, max_timesteps=False, render=False,
         x, y_, y, _, train_step = build_network(input_shape, target_shape)
         sess.run(tf.global_variables_initializer())
 
+        # Create saver to save model
+        saver = tf.train.Saver()
+
         # Setup environment
         import gym
         env = gym.make(envname)
@@ -33,8 +36,8 @@ def dagger(envname, data_file, expert_file, max_timesteps=False, render=False,
             print('iter', i)
 
             # Training with current aggregated data
-            train(sess, train_step, input_data, x, target_data, y_, num_train_iters,
-                  batch_size)
+            train(sess, train_step, input_data, x, target_data, y_,
+                  num_train_iters, batch_size)
 
             observations = []
             target_actions = []
@@ -64,6 +67,7 @@ def dagger(envname, data_file, expert_file, max_timesteps=False, render=False,
             target_data = np.append(target_data, target_actions, axis=0)
             input_data, target_data = shuffle(input_data, target_data)
             returns.append(totalr)
+            saver.save(sess, model_file)
 
         plt.xlabel('DAgger iterations')
         plt.ylabel('Returns')
@@ -71,7 +75,8 @@ def dagger(envname, data_file, expert_file, max_timesteps=False, render=False,
         plt.show()
 
 
-def train(sess, train_step, input_data, x, target_data, y_, num_iters, batch_size):
+def train(sess, train_step, input_data, x, target_data, y_, num_iters,
+          batch_size):
     # training
     n = input_data.shape[0]
     for step in range(num_iters):
@@ -85,9 +90,12 @@ def shuffle(input_data, target_data):
     np.random.shuffle(order)
     return input_data[order], target_data[order]
 
-if __name__ == '__main__':
-    envname = 'Hopper-v1'
-    data_file = 'data/data_Hopper-v1_rollouts_100.npz'
-    expert_file = 'experts/Hopper-v1.pkl'
 
-    dagger(envname, data_file, expert_file)
+if __name__ == '__main__':
+    envname = 'Humanoid-v1'
+    data_rolls = 100
+    data_file = 'data/' + envname + '_data_' + str(data_rolls) + '.npz'
+    expert_file = 'experts/' + envname + '.pkl'
+    model_file = 'models/' + envname + '_dagger'
+
+    dagger(envname, data_file, expert_file, model_file)
