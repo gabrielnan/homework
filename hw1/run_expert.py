@@ -16,6 +16,7 @@ import tf_util
 import gym
 import load_policy
 
+
 def main():
     import argparse
     parser = argparse.ArgumentParser()
@@ -49,7 +50,7 @@ def main():
             totalr = 0.
             steps = 0
             while not done:
-                action = policy_fn(obs[None,:])
+                action = policy_fn(obs[None, :])
                 observations.append(obs)
                 actions.append(action)
                 obs, r, done, _ = env.step(action)
@@ -57,7 +58,7 @@ def main():
                 steps += 1
                 if args.render:
                     env.render()
-                if steps % 100 == 0: print("%i/%i"%(steps, max_steps))
+                if steps % 100 == 0: print("%i/%i" % (steps, max_steps))
                 if steps >= max_steps:
                     break
             returns.append(totalr)
@@ -70,8 +71,10 @@ def main():
                        'actions': np.array(actions)}
         filename = args.data_filename
         if filename == '':
-            filename = 'data_' + args.envname + '_rollouts_' + str(args.num_rollouts)
+            filename = 'data_' + args.envname + '_rollouts_' + str(
+                args.num_rollouts)
         np.savez('data/' + filename, **expert_data)
+
 
 if __name__ == '__main__':
     main()
